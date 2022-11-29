@@ -1,0 +1,14 @@
+# For local development only.
+
+version: '3.5'
+
+services:
+  cphalcon-swoole:
+    container_name: cphalcon-swoole
+    hostname: cphalcon-swoole
+    build: .docker
+    working_dir: /srv
+    ports:
+      - "9501:9501"
+    volumes:
+      - .:/srv
