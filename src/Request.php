@@ -17,6 +17,7 @@ use Phalcon\Di\AbstractInjectionAware;
 use Phalcon\Di\InjectionAwareInterface;
 use Phalcon\Filter\FilterInterface;
 use Phalcon\Http\Message\RequestMethodInterface;
+use Phalcon\Http\Request\File;
 use Phalcon\Http\RequestInterface;
 use Phalcon\Http\Request\Exception;
 use Swoole\Http\Request as SwooleRequest;
@@ -47,6 +48,7 @@ class Request extends AbstractInjectionAware implements RequestInterface, Reques
         $this->swooleRequest->get = $this->swooleRequest->get ?: [];
         $this->swooleRequest->post = $this->swooleRequest->post ?: [];
         $this->swooleRequest->cookie = $this->swooleRequest->cookie ?: [];
+        $this->swooleRequest->files = $this->swooleRequest->files ?: [];
 
         $this->combinedRequest = array_merge(
             $this->swooleRequest->get,
@@ -121,9 +123,15 @@ class Request extends AbstractInjectionAware implements RequestInterface, Reques
         // TODO: Implement getClientAddress() method.
     }
 
+    /**
+     * Gets a charsets array and their quality accepted by the browser/client
+     * from $_SERVER["HTTP_ACCEPT_CHARSET"].
+     *
+     * @return array
+     */
     public function getClientCharsets(): array
     {
-        // TODO: Implement getClientCharsets() method.
+        return $this->getQualityHeader('accept_charset', 'charset');
     }
 
     /**
@@ -162,17 +170,35 @@ class Request extends AbstractInjectionAware implements RequestInterface, Reques
 
     public function getHTTPReferer(): string
     {
-        // TODO: Implement getHTTPReferer() method.
+        return $this->swooleRequest->server['http_referer'] ?? '';
     }
 
-    public function getJsonRawBody(bool $associative = false)
+    /**
+     * Gets decoded JSON HTTP raw request body.
+     *
+     * @param bool $associative
+     * @return mixed
+     */
+    public function getJsonRawBody(bool $associative = false): mixed
     {
-        // TODO: Implement getJsonRawBody() method.
+        $rawBody = $this->getRawBody();
+
+        if (!is_string($rawBody)) {
+            return false;
+        }
+
+        return json_decode($rawBody, $associative);
     }
 
+    /**
+     * Gets languages array and their quality accepted by the browser/client
+     * from $_SERVER["HTTP_ACCEPT_LANGUAGE"].
+     *
+     * @return array
+     */
     public function getLanguages(): array
     {
-        // TODO: Implement getLanguages() method.
+        return $this->getQualityHeader('accept-language', 'language');
     }
 
     public function getMethod(): string
@@ -187,14 +213,62 @@ class Request extends AbstractInjectionAware implements RequestInterface, Reques
         return $this->swooleRequest->server['server_port'];
     }
 
+    /**
+     * Gets HTTP URI which request has been made to
+     *
+     *```php
+     * // Returns /some/path?with=queryParams
+     * $uri = $request->getURI();
+     *
+     * // Returns /some/path
+     * $uri = $request->getURI(true);
+     *```
+     *
+     * @param bool $onlyPath If true, query part will be omitted
+     * @return string
+     */
     public function getURI(bool $onlyPath = false): string
     {
-        // TODO: Implement getURI() method.
+        $requestUri = $this->getServer('request_uri');
+        if (null === $requestUri) {
+            return '';
+        }
+
+        if ($onlyPath) {
+            return explode('?', $requestUri)[0];
+        }
+
+        return $requestUri;
     }
 
-    public function getPost(string $name = null, $filters = null, $defaultValue = null, bool $notAllowEmpty = false, bool $noRecursive = false)
-    {
-        // TODO: Implement getPost() method.
+    /**
+     * Gets a variable from the $_POST superglobal applying filters if needed
+     * If no parameters are given the $_POST superglobal is returned
+     *
+     *```php
+     * // Returns value from $_POST["user_email"] without sanitizing
+     * $userEmail = $request->getPost("user_email");
+     *
+     * // Returns value from $_POST["user_email"] with sanitizing
+     * $userEmail = $request->getPost("user_email", "email");
+     *```
+     *
+     * @param string|null $name
+     * @param null $filters
+     * @param null $defaultValue
+     * @param bool $notAllowEmpty
+     * @param bool $noRecursive
+     * @return mixed
+     * @throws Exception
+     */
+    public function getPost(
+        string $name = null,
+        $filters = null,
+        $defaultValue = null,
+        bool $notAllowEmpty = false,
+        bool $noRecursive = false,
+    ) {
+        return $this->getHelper($this->swooleRequest->post, $name, $filters, $defaultValue, $notAllowEmpty, $noRecursive);
     }
 
     public function getPut(string $name = null, $filters = null, $defaultValue = null, bool $notAllowEmpty = false, bool $noRecursive = false)
@@ -202,9 +276,44 @@ class Request extends AbstractInjectionAware implements RequestInterface, Reques
         // TODO: Implement getPut() method.
     }
 
-    public function getQuery(string $name = null, $filters = null, $defaultValue = null, bool $notAllowEmpty = false, bool $noRecursive = false)
-    {
-        // TODO: Implement getQuery() method.
+    /**
+     * Gets variable from $_GET superglobal applying filters if needed
+     * If no parameters are given the $_GET superglobal is returned
+     *
+     *```php
+     * // Returns value from $_GET["id"] without sanitizing
+     * $id = $request->getQuery("id");
+     *
+     * // Returns value from $_GET["id"] with sanitizing
+     * $id = $request->getQuery("id", "int");
+     *
+     * // Returns value from $_GET["id"] with a default value
+     * $id = $request->getQuery("id", null, 150);
+     *```
+     *
+     * @param string|null $name
+     * @param null $filters
+     * @param null $defaultValue
+     * @param bool $notAllowEmpty
+     * @param bool $noRecursive
+     * @return mixed
+     * @throws Exception
+     */
+    public function getQuery(
+        string $name = null,
+        $filters = null,
+        $defaultValue = null,
+        bool $notAllowEmpty = false,
+        bool $noRecursive = false,
+    ): mixed {
+        return $this->getHelper(
+            $this->swooleRequest->get,
+            $name,
+            $filters,
+            $defaultValue,
+            $notAllowEmpty,
+            $noRecursive,
+        );
     }
 
     public function getRawBody(): string
@@ -248,9 +357,57 @@ class Request extends AbstractInjectionAware implements RequestInterface, Reques
         return $this->getServer('server_name') ?: 'localhost';
     }
 
+    /**
+     * Gets attached files as Phalcon\Http\Request\File instances.
+     *
+     * @param bool $onlySuccessful
+     * @param bool $namedKeys
+     * @return File[]
+     */
     public function getUploadedFiles(bool $onlySuccessful = false, bool $namedKeys = false): array
     {
-        // TODO: Implement getUploadedFiles() method.
+        $files = [];
+
+        foreach ($this->swooleRequest->files as $prefix => $input) {
+            if (is_array($input['name'])) {
+                $smoothInput = $this->smoothFiles(
+                    $input['name'],
+                    $input['type'],
+                    $input['tmp_name'],
+                    $input['size'],
+                    $input['error'],
+                    $prefix,
+                );
+
+                foreach ($smoothInput as $file) {
+                    if ($onlySuccessful === false || $file['error'] == UPLOAD_ERR_OK) {
+                        $dataFile = [
+                            'name' => $file['name'],
+                            'type' => $file['type'],
+                            'tmp_name' => $file['tmp_name'],
+                            'size' => $file['size'],
+                            'error' => $file['error'],
+                        ];
+
+                        if ($namedKeys === true) {
+                            $files[$file['key']] = new File($dataFile, $file['key']);
+                        } else {
+                            $files[] = new File($dataFile, $file['key']);
+                        }
+                    }
+                }
+            }
+
+            if (!$onlySuccessful || $input['error'] == UPLOAD_ERR_OK) {
+                if ($namedKeys === true) {
+                    $files[$prefix] = new File($input, $prefix);
+                } else {
+                    $files[] = new File($input, $prefix);
+                }
+            }
+        }
+
+        return $files;
     }
 
     public function getUserAgent(): string
@@ -556,5 +713,97 @@ class Request extends AbstractInjectionAware implements RequestInterface, Reques
     private function getServerArray(): array
     {
         return $this->swooleRequest->header ?: [];
+    }
+
+    /**
+     * Smooth out $_FILES to have plain array with all files uploaded.
+     *
+     * @param array $names
+     * @param array $types
+     * @param array $tmpNames
+     * @param array $sizes
+     * @param array $errors
+     * @param string $prefix
+     * @return array
+     */
+    final protected function smoothFiles(
+        array $names,
+        array $types,
+        array $tmpNames,
+        array $sizes,
+        array $errors,
+        string $prefix,
+    ): array {
+        $files = [];
+
+        foreach ($names as $idx => $name) {
+            $p = $prefix . '.' . $idx;
+
+            if (is_string($name)) {
+                $files[] = [
+                    'name' => $name,
+                    'type' => $types[$idx],
+                    'tmp_name' => $tmpNames[$idx],
+                    'size' => $sizes[$idx],
+                    'error' => $sizes[$idx],
+                    'key' => $p,
+                ];
+            }
+
+            if (is_array($name)) {
+                $parentFiles = $this->smoothFiles(
+                    $name,
+                    $types[$idx],
+                    $tmpNames[$idx],
+                    $sizes[$idx],
+                    $errors[$idx],
+                    $p,
+                );
+
+                foreach ($parentFiles as $file) {
+                    $files[] = $file;
+                }
+            }
+        }
+
+        return $files;
+    }
+
+    /**
+     * Process a request header and return an array of values with their qualities.
+     *
+     * @param string $serverIndex
+     * @param string $name
+     * @return array
+     */
+    final protected function getQualityHeader(string $serverIndex, string $name): array
+    {
+        $returnedParts = [];
+        $serverValue = $this->getServer($serverIndex);
+        $serverValue = (null === $serverValue) ? '' : $serverValue;
+
+        $parts = preg_split('/,\\s*/', $serverValue, -1, PREG_SPLIT_NO_EMPTY);
+        foreach ($parts as $part) {
+            $headerParts = [];
+            $headerSplit = preg_split('/\s*;\s*/', trim($part), -1, PREG_SPLIT_NO_EMPTY);
+
+            foreach ($headerSplit as $headerPart) {
+                if (strpos($headerPart, '=') !== false) {
+                    $split = explode('=', $headerPart, 2);
+                    if ($split[0] === 'q') {
+                        $headerParts['quality'] = (float)$split[1];
+                    } else {
+                        $headerParts[$split[0]] = $split[1];
+                    }
+                } else {
+                    $headerParts[$name] = $headerPart;
+                    $headerParts['quality'] = 1.0;
+                }
+
+                $returnedParts[] = $headerParts;
+            }
+        }
+
+        return $returnedParts;
     }
 }
