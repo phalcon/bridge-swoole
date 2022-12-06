@@ -31,13 +31,13 @@ class Response extends \Phalcon\Http\Response implements ResponseInterface
     {
         $this->swooleResponse->setStatusCode($code, (string)$message);
 
-        return parent::setStatusCode($code, $message);
+        return $this;
     }
 
     public function setHeader(string $name, $value): ResponseInterface
     {
         $this->swooleResponse->setHeader($name, $value);
 
-        return parent::setHeader($name, $value);
+        return $this;
     }
 }
