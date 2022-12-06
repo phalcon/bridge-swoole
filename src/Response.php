@@ -40,4 +40,11 @@ class Response extends \Phalcon\Http\Response implements ResponseInterface
 
         return $this;
     }
+
+    public function setContent(string $content): ResponseInterface
+    {
+        $this->swooleResponse->write($content);
+
+        return parent::setContent($content);
+    }
 }
