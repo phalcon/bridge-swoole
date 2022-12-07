@@ -20,11 +20,15 @@ class Response extends \Phalcon\Http\Response implements ResponseInterface
 {
     private SwooleResponse $swooleResponse;
 
-    public function __construct(SwooleResponse $swooleResponse)
-    {
+    public function __construct(
+        SwooleResponse $swooleResponse,
+        ?string $content = null,
+        ?int $code = null,
+        ?string $status = null
+    ) {
         $this->swooleResponse = $swooleResponse;
 
-        parent::__construct();
+        parent::__construct($content, $code, $status);
     }
 
     public function setStatusCode(int $code, ?string $message = null): ResponseInterface
