@@ -40,7 +40,7 @@ class Response extends \Phalcon\Http\Response implements ResponseInterface
 
     public function setHeader(string $name, $value): ResponseInterface
     {
-        $this->swooleResponse->header($name, $value);
+        $this->swooleResponse->setHeader($name, $value);
 
         return $this;
     }
