@@ -26,46 +26,36 @@ $http->on('start', function () {
 });
 
 $http->on('request', function (Request $request, Response $response) {
-    //var_dump($request); exit;
     $app = new Micro();
-    $app['request'] = function () use ($request) {
-        return new \Phalcon\Bridge\Swoole\Request($request);
-    };
-    $app['response'] = function () use ($response) {
-        return new \Phalcon\Bridge\Swoole\Response($response);
-    };
-
-    $app->get('/', function() use ($app) {
-        $app
-            ->response
-            ->setExpires(new DateTime())
-            ->setContent('Hello World!');
+    $app->setService('request', new \Phalcon\Bridge\Swoole\Request($request), true);
+    $app->setService('response', new \Phalcon\Bridge\Swoole\Response($response), true);
+    /**
+     * We need to define our response handler, because
+     * default Micro response handler will send output
+     * into client, meanwhile we just want it to pass
+     * to the Swoole response end() method.
+     */
+    $app->setResponseHandler(function () use ($app) {
+        return $app->response->getContent();
     });
 
-    $app->get('/co', function() use ($app) {
-        $result = [];
-        Co::join([
-            go(function () use (&$result) {
-                $result['google'] = md5(file_get_contents("https://www.google.com/"));
-            }),
-            go(function () use (&$result) {
-                $result['taobao'] = md5(file_get_contents("https://www.taobao.com/"));
-            })
-        ]);
-
-        $app->response->setJsonContent($result);
-    });
+    /**
+     * Without fallback 404 handler it will crush.
+     */
     $app->notFound(function () use ($app) {
         $app
             ->response
             ->setStatusCode(404, 'Not Found')
-            ->sendHeaders()
             ->setContent('Not found');
     });
 
-    $handler = $app->handle($request->server['request_uri']);
-    $content = $handler === null ? $app->response->getContent() : $handler;
+    $app->get('/', function() use ($app) {
+        $app
+            ->response
+            ->setContent('Hello World');
+    });
 
+    $content = $app->handle($request->server['request_uri']);
     $response->end($content);
 });
 
