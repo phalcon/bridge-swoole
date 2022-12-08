@@ -163,9 +163,15 @@ class Request extends AbstractInjectionAware implements RequestInterface, Reques
         // TODO: Implement getHeaders() method.
     }
 
+    /**
+     * Gets active server host or name
+     *
+     * @return string
+     */
     public function getHttpHost(): string
     {
-        // TODO: Implement getHttpHost() method.
+        return $this->getServer('http_host') ?:
+            $this->getServerName();
     }
 
     public function getHTTPReferer(): string
