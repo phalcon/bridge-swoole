@@ -1,0 +1,26 @@
+# This file is part of Phalcon.
+#
+# (c) Phalcon Team <team@phalcon.io>
+#
+# For the full copyright and license information, please view
+# the LICENSE file that was distributed with this source code.
+
+name: Phalcon CI
+
+on:
+  push:
+
+jobs:
+  runs-on: ubuntu-latest
+  steps:
+    - uses: actions/checkout@v3
+
+    - name: Setup PHP with Extensions
+      uses: shivammathur/setup-php@v2
+      with:
+        php-version: 8.0
+        extensions: swoole, phalcon
+        tools: pecl
+
+    - run: composer validate
+    - run: composer install
