@@ -86,9 +86,15 @@ class Request extends AbstractInjectionAware implements RequestInterface, Reques
         return $this->getHelper($this->combinedRequest, $name, $filters, $defaultValue, $notAllowEmpty, $noRecursive);
     }
 
+    /**
+     * Gets an array with mime/types and their quality accepted by the
+     * browser/client from $_SERVER["HTTP_ACCEPT"]
+     *
+     * @return array
+     */
     public function getAcceptableContent(): array
     {
-        // TODO: Implement getAcceptableContent() method.
+        return $this->getQualityHeader('http_accept', 'accept');
     }
 
     public function getBasicAuth(): ?array
