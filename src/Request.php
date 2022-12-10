@@ -109,9 +109,15 @@ class Request extends AbstractInjectionAware implements RequestInterface, Reques
         ];
     }
 
+    /**
+     * Gets best mime/type accepted by the browser/client from
+     * $_SERVER["HTTP_ACCEPT"]
+     *
+     * @return string
+     */
     public function getBestAccept(): string
     {
-        // TODO: Implement getBestAccept() method.
+        return $this->getBestQuality($this->getAcceptableContent(), 'accept');
     }
 
     public function getBestCharset(): string
@@ -817,5 +823,37 @@ class Request extends AbstractInjectionAware implements RequestInterface, Reques
         }
 
         return $returnedParts;
+    }
+
+    /**
+     * Process a request header and return the one with best quality
+     *
+     * @param array $qualityParts
+     * @param string $name
+     * @return string
+     */
+    final protected function getBestQuality(array $qualityParts, string $name): string
+    {
+        $i = 0;
+        $quality = 0.0;
+        $selectedName = '';
+
+        foreach ($qualityParts as $accept) {
+            if ($i === 0) {
+                $quality = (float)$accept['quality'];
+                $selectedName = $accept[$name];
+            } else {
+                $acceptQuality = (float)$accept['quality'];
+
+                if ($acceptQuality > $quality) {
+                    $quality = $acceptQuality;
+                    $selectedName = $accept[$name];
+                }
+            }
+
+            $i++;
+        }
+
+        return $selectedName;
     }
 }
