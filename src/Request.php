@@ -172,7 +172,7 @@ class Request extends AbstractInjectionAware implements RequestInterface, Reques
 
     public function getHeaders(): array
     {
-        // TODO: Implement getHeaders() method.
+        return $this->getServerArray();
     }
 
     /**
