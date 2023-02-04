@@ -289,9 +289,33 @@ class Request extends AbstractInjectionAware implements RequestInterface, Reques
         return $this->getHelper($this->swooleRequest->post, $name, $filters, $defaultValue, $notAllowEmpty, $noRecursive);
     }
 
-    public function getPut(string $name = null, $filters = null, $defaultValue = null, bool $notAllowEmpty = false, bool $noRecursive = false)
-    {
-        // TODO: Implement getPut() method.
+    /**
+     * Gets a variable from put request
+     *
+     *```php
+     * // Returns value from $_PUT["user_email"] without sanitizing
+     * $userEmail = $request->getPut("user_email");
+     *
+     * // Returns value from $_PUT["user_email"] with sanitizing
+     * $userEmail = $request->getPut("user_email", "email");
+     *```
+     *
+     * @param string|null $name
+     * @param null $filters
+     * @param null $defaultValue
+     * @param bool $notAllowEmpty
+     * @param bool $noRecursive
+     * @return mixed
+     * @throws Exception
+     */
+    public function getPut(
+        string $name = null,
+        $filters = null,
+        $defaultValue = null,
+        bool $notAllowEmpty = false,
+        bool $noRecursive = false,
+    ) {
+        return $this->getHelper($this->swooleRequest->post, $name, $filters, $defaultValue, $notAllowEmpty, $noRecursive);
     }
 
     /**
