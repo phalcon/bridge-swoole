@@ -138,9 +138,14 @@ class Request extends AbstractInjectionAware implements RequestInterface, Reques
         return $this->getBestQuality($this->getAcceptableContent(), 'language');
     }
 
+    /**
+     * Gets most possible client IPv4 Address. This method searches in
+     * `$_SERVER["REMOTE_ADDR"]` and optionally in
+     * `$_SERVER["HTTP_X_FORWARDED_FOR"]`
+     */
     public function getClientAddress(bool $trustForwardedHeader = false)
     {
-        // TODO: Implement getClientAddress() method.
+        return $this->swooleRequest->server['remote_addr'];
     }
 
     /**
