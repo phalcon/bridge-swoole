@@ -173,7 +173,22 @@ class Request extends AbstractInjectionAware implements RequestInterface, Reques
      */
     public function getDigestAuth(): array
     {
-        // TODO: Implement getDigestAuth() method.
+        $auth = [];
+        $server = $this->getServerArray();
+
+        if (isset($server['php_auth_digest'])) {
+            if (!preg_match_all("#(\\w+)=(['\"]?)([^'\" ,]+)\\2#", $server['php_auth_digest'], $matches, 2)) {
+                return $auth;
+            }
+
+            if (!empty($matches)) {
+                foreach ($matches as $match) {
+                    $auth[$match[1]] = $match[3];
+                }
+            }
+        }
+
+        return $auth;
     }
 
     /**
