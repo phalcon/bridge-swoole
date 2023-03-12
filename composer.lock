@@ -9,16 +9,16 @@
     "packages-dev": [
         {
             "name": "phalcon/ide-stubs",
-            "version": "v5.1.0",
+            "version": "v5.2.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/phalcon/ide-stubs.git",
-                "reference": "409ec3ea7bba5bfd5af5a221dd59ad3de968e792"
+                "reference": "2f70d8faf7ec85763899f6cfb535fdcb6307c3f8"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/phalcon/ide-stubs/zipball/409ec3ea7bba5bfd5af5a221dd59ad3de968e792",
-                "reference": "409ec3ea7bba5bfd5af5a221dd59ad3de968e792",
+                "url": "https://api.github.com/repos/phalcon/ide-stubs/zipball/2f70d8faf7ec85763899f6cfb535fdcb6307c3f8",
+                "reference": "2f70d8faf7ec85763899f6cfb535fdcb6307c3f8",
                 "shasum": ""
             },
             "require": {
@@ -72,7 +72,7 @@
                     "type": "open_collective"
                 }
             ],
-            "time": "2022-11-02T03:55:40+00:00"
+            "time": "2023-03-08T15:01:52+00:00"
         },
         {
             "name": "swoole/ide-helper",
