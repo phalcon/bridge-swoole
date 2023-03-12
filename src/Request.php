@@ -120,14 +120,22 @@ class Request extends AbstractInjectionAware implements RequestInterface, Reques
         return $this->getBestQuality($this->getAcceptableContent(), 'accept');
     }
 
+    /**
+     * Gets best charset accepted by the browser/client from
+     * $_SERVER["HTTP_ACCEPT_CHARSET"]
+     */
     public function getBestCharset(): string
     {
-        // TODO: Implement getBestCharset() method.
+        return $this->getBestQuality($this->getAcceptableContent(), 'charset');
     }
 
+    /**
+     * Gets the best language accepted by the browser/client from
+     * $_SERVER["HTTP_ACCEPT_LANGUAGE"]
+     */
     public function getBestLanguage(): string
     {
-        // TODO: Implement getBestLanguage() method.
+        return $this->getBestQuality($this->getAcceptableContent(), 'language');
     }
 
     public function getClientAddress(bool $trustForwardedHeader = false)
@@ -154,6 +162,10 @@ class Request extends AbstractInjectionAware implements RequestInterface, Reques
         return $this->getServerArray()['content_type'] ?? null;
     }
 
+    /**
+     * Gets auth info accepted by the browser/client from
+     * $_SERVER["PHP_AUTH_DIGEST"]
+     */
     public function getDigestAuth(): array
     {
         // TODO: Implement getDigestAuth() method.
