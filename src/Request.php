@@ -862,7 +862,7 @@ class Request extends AbstractInjectionAware implements RequestInterface, Reques
             $headerSplit = preg_split('/\s*;\s*/', trim($part), -1, PREG_SPLIT_NO_EMPTY);
 
             foreach ($headerSplit as $headerPart) {
-                if (strpos($headerPart, '=') !== false) {
+                if (str_contains($headerPart, '=')) {
                     $split = explode('=', $headerPart, 2);
                     if ($split[0] === 'q') {
                         $headerParts['quality'] = (float)$split[1];
