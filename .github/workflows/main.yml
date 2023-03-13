@@ -13,14 +13,33 @@ on:
 jobs:
   validate:
     runs-on: ubuntu-latest
+    env:
+      extensions: phalcon, swoole
+      cache-key: cache-extensions-v1
+      base-php-version: 8.0
     steps:
       - uses: actions/checkout@v3
+
+      - name: Setup cache environment
+        id: extcache
+        uses: shivammathur/cache-extensions@v1
+        with:
+          php-version: ${{ env.base-php-version }}
+          extensions: ${{ env.extensions }}
+          key: ${{ env.cache-key }}
+
+      - name: Cache extensions
+        uses: actions/cache@v3
+        with:
+          path: ${{ steps.extcache.outputs.dir }}
+          key: ${{ steps.extcache.outputs.key }}
+          restore-keys: ${{ steps.extcache.outputs.key }}
 
       - name: Setup PHP with Extensions
         uses: shivammathur/setup-php@v2
         with:
-          php-version: 8.0
-          extensions: swoole, phalcon
+          php-version: ${{ env.base-php-version }}
+          extensions: ${{ env.extensions }}
           tools: pecl
 
       - run: composer validate
