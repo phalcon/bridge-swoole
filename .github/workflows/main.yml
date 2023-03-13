@@ -13,15 +13,15 @@ on:
 jobs:
   validate:
     runs-on: ubuntu-latest
-      steps:
-          - uses: actions/checkout@v3
+    steps:
+      - uses: actions/checkout@v3
 
-          - name: Setup PHP with Extensions
-            uses: shivammathur/setup-php@v2
-            with:
-              php-version: 8.0
-              extensions: swoole, phalcon
-              tools: pecl
+      - name: Setup PHP with Extensions
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: 8.0
+          extensions: swoole, phalcon
+          tools: pecl
 
-          - run: composer validate
-          - run: composer install
+      - run: composer validate
+      - run: composer install
