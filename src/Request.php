@@ -77,7 +77,7 @@ class Request extends AbstractInjectionAware implements RequestInterface, Reques
      * @throws Exception
      */
     public function get(
-        string $name = null,
+        ?string $name = null,
         $filters = null,
         $defaultValue = null,
         bool $notAllowEmpty = false,
@@ -143,7 +143,7 @@ class Request extends AbstractInjectionAware implements RequestInterface, Reques
      * `$_SERVER["REMOTE_ADDR"]` and optionally in
      * `$_SERVER["HTTP_X_FORWARDED_FOR"]`
      */
-    public function getClientAddress(bool $trustForwardedHeader = false)
+    public function getClientAddress(bool $trustForwardedHeader = false): bool|string
     {
         return $this->swooleRequest->server['remote_addr'];
     }
@@ -227,9 +227,9 @@ class Request extends AbstractInjectionAware implements RequestInterface, Reques
      * Gets decoded JSON HTTP raw request body.
      *
      * @param bool $associative
-     * @return mixed
+     * @return array|bool|\stdClass
      */
-    public function getJsonRawBody(bool $associative = false): mixed
+    public function getJsonRawBody(bool $associative = false): array|bool|\stdClass
     {
         $rawBody = $this->getRawBody();
 
@@ -312,12 +312,12 @@ class Request extends AbstractInjectionAware implements RequestInterface, Reques
      * @throws Exception
      */
     public function getPost(
-        string $name = null,
+        ?string $name = null,
         $filters = null,
         $defaultValue = null,
         bool $notAllowEmpty = false,
         bool $noRecursive = false,
-    ) {
+    ): mixed {
         return $this->getHelper($this->swooleRequest->post, $name, $filters, $defaultValue, $notAllowEmpty, $noRecursive);
     }
 
@@ -341,12 +341,12 @@ class Request extends AbstractInjectionAware implements RequestInterface, Reques
      * @throws Exception
      */
     public function getPut(
-        string $name = null,
+        ?string $name = null,
         $filters = null,
         $defaultValue = null,
         bool $notAllowEmpty = false,
         bool $noRecursive = false,
-    ) {
+    ): mixed {
         return $this->getHelper($this->swooleRequest->post, $name, $filters, $defaultValue, $notAllowEmpty, $noRecursive);
     }
 
@@ -371,10 +371,10 @@ class Request extends AbstractInjectionAware implements RequestInterface, Reques
      * @param bool $notAllowEmpty
      * @param bool $noRecursive
      * @return mixed
-     * @throws Exception
+     * @throws \Exception
      */
     public function getQuery(
-        string $name = null,
+        ?string $name = null,
         $filters = null,
         $defaultValue = null,
         bool $notAllowEmpty = false,
@@ -725,7 +725,7 @@ class Request extends AbstractInjectionAware implements RequestInterface, Reques
      * @param bool $notAllowEmpty
      * @param bool $noRecursive
      * @return mixed
-     * @throws Exception
+     * @throws \Exception
      */
     final protected function getHelper(
         array   $source,

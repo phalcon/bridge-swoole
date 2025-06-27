@@ -4,21 +4,21 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "4eb3defa40f4d70ecb16c3c9ca07ea20",
+    "content-hash": "ca4d1a7339c84f6d0805dfb895bbf710",
     "packages": [],
     "packages-dev": [
         {
             "name": "phalcon/ide-stubs",
-            "version": "v5.2.1",
+            "version": "v5.9.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/phalcon/ide-stubs.git",
-                "reference": "2f70d8faf7ec85763899f6cfb535fdcb6307c3f8"
+                "reference": "279475ec34dd07cda7e95cdbb944f3d3df035fb4"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/phalcon/ide-stubs/zipball/2f70d8faf7ec85763899f6cfb535fdcb6307c3f8",
-                "reference": "2f70d8faf7ec85763899f6cfb535fdcb6307c3f8",
+                "url": "https://api.github.com/repos/phalcon/ide-stubs/zipball/279475ec34dd07cda7e95cdbb944f3d3df035fb4",
+                "reference": "279475ec34dd07cda7e95cdbb944f3d3df035fb4",
                 "shasum": ""
             },
             "require": {
@@ -72,20 +72,20 @@
                     "type": "open_collective"
                 }
             ],
-            "time": "2023-03-08T15:01:52+00:00"
+            "time": "2025-04-22T19:22:59+00:00"
         },
         {
             "name": "swoole/ide-helper",
-            "version": "5.0.1",
+            "version": "6.0.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/swoole/ide-helper.git",
-                "reference": "f9cdf7bfb70ef3a8a2b8e9eb14ce3d09c02524fa"
+                "reference": "6f12243dce071714c5febe059578d909698f9a52"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/swoole/ide-helper/zipball/f9cdf7bfb70ef3a8a2b8e9eb14ce3d09c02524fa",
-                "reference": "f9cdf7bfb70ef3a8a2b8e9eb14ce3d09c02524fa",
+                "url": "https://api.github.com/repos/swoole/ide-helper/zipball/6f12243dce071714c5febe059578d909698f9a52",
+                "reference": "6f12243dce071714c5febe059578d909698f9a52",
                 "shasum": ""
             },
             "type": "library",
@@ -102,32 +102,22 @@
             "description": "IDE help files for Swoole.",
             "support": {
                 "issues": "https://github.com/swoole/ide-helper/issues",
-                "source": "https://github.com/swoole/ide-helper/tree/5.0.1"
+                "source": "https://github.com/swoole/ide-helper/tree/6.0.2"
             },
-            "funding": [
-                {
-                    "url": "https://gitee.com/swoole/swoole?donate=true",
-                    "type": "custom"
-                },
-                {
-                    "url": "https://github.com/swoole",
-                    "type": "github"
-                }
-            ],
-            "time": "2022-11-08T07:13:40+00:00"
+            "time": "2025-03-23T07:31:41+00:00"
         }
     ],
     "aliases": [],
     "minimum-stability": "stable",
-    "stability-flags": [],
+    "stability-flags": {},
     "prefer-stable": false,
     "prefer-lowest": false,
     "platform": {
-        "php": ">=8.0",
+        "php": ">=8.4",
         "ext-json": "*",
-        "ext-phalcon": "^5.1",
-        "ext-swoole": "^5.0"
+        "ext-phalcon": "^5.2",
+        "ext-swoole": "^6.0"
     },
-    "platform-dev": [],
-    "plugin-api-version": "2.3.0"
+    "platform-dev": {},
+    "plugin-api-version": "2.6.0"
 }
