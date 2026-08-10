@@ -21,6 +21,7 @@ use Phalcon\Http\Request\File;
 use Phalcon\Http\RequestInterface;
 use Phalcon\Http\Request\Exception;
 use Swoole\Http\Request as SwooleRequest;
+use stdClass;
 
 class Request extends AbstractInjectionAware implements RequestInterface, RequestMethodInterface, InjectionAwareInterface
 {
@@ -77,7 +78,7 @@ class Request extends AbstractInjectionAware implements RequestInterface, Reques
      * @throws Exception
      */
     public function get(
-        string $name = null,
+        ?string $name = null,
         $filters = null,
         $defaultValue = null,
         bool $notAllowEmpty = false,
@@ -143,9 +144,9 @@ class Request extends AbstractInjectionAware implements RequestInterface, Reques
      * `$_SERVER["REMOTE_ADDR"]` and optionally in
      * `$_SERVER["HTTP_X_FORWARDED_FOR"]`
      */
-    public function getClientAddress(bool $trustForwardedHeader = false)
+    public function getClientAddress(bool $trustForwardedHeader = false): string|bool
     {
-        return $this->swooleRequest->server['remote_addr'];
+        return $this->swooleRequest->server['remote_addr'] ?? false;
     }
 
     /**
@@ -229,15 +230,26 @@ class Request extends AbstractInjectionAware implements RequestInterface, Reques
      * @param bool $associative
      * @return mixed
      */
-    public function getJsonRawBody(bool $associative = false): mixed
+    public function getJsonRawBody(bool $associative = false): stdClass|array|bool
     {
         $rawBody = $this->getRawBody();
 
-        if (!is_string($rawBody)) {
+        if ('' === $rawBody) {
             return false;
         }
 
-        return json_decode($rawBody, $associative);
+        $decoded = json_decode($rawBody, $associative);
+
+        /**
+         * The interface admits an object, an array or false. Malformed JSON and a
+         * scalar body (`5`, `"x"`, `true`) both read as failure rather than being
+         * returned as a type the caller cannot receive.
+         */
+        if ($decoded instanceof stdClass || is_array($decoded)) {
+            return $decoded;
+        }
+
+        return false;
     }
 
     /**
@@ -312,7 +324,7 @@ class Request extends AbstractInjectionAware implements RequestInterface, Reques
      * @throws Exception
      */
     public function getPost(
-        string $name = null,
+        ?string $name = null,
         $filters = null,
         $defaultValue = null,
         bool $notAllowEmpty = false,
@@ -341,7 +353,7 @@ class Request extends AbstractInjectionAware implements RequestInterface, Reques
      * @throws Exception
      */
     public function getPut(
-        string $name = null,
+        ?string $name = null,
         $filters = null,
         $defaultValue = null,
         bool $notAllowEmpty = false,
@@ -374,7 +386,7 @@ class Request extends AbstractInjectionAware implements RequestInterface, Reques
      * @throws Exception
      */
     public function getQuery(
-        string $name = null,
+        ?string $name = null,
         $filters = null,
         $defaultValue = null,
         bool $notAllowEmpty = false,
